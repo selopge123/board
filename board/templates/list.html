@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <title></title>
+</head>
+<body>
+    <h2>게시판</h2>
+
+    <form method="post">
+        <select name="search_option">
+        {% if search_option == 'writer' %}
+            <option value="writer" selected>이름</option>
+            <option value="title">제목</option>
+            <option value="content">내용</option>
+            <option value="all">이름+제목+내용</option>
+        {% elif search_option == 'title' %}
+            <option value="writer">이름</option>
+            <option value="title" selected>제목</option>
+            <option value="content">내용</option>
+            <option value="all">이름+제목+내용</option>
+        {% elif search_option == 'content' %}
+            <option value="writer">이름</option>
+            <option value="title">제목</option>
+            <option value="content" selected>내용</option>
+            <option value="all">이름+제목+내용</option>        
+        {% elif search_option == 'all' %}
+            <option value="writer">이름</option>
+            <option value="title">제목</option>
+            <option value="content">내용</option>
+            <option value="all" selected>이름+제목+내용</option>
+        {% endif %}
+        </select>
+        <!-- 의도된 대로 안되었으나 수정 : render 함수에서 변수를 보내줘야 함-->
+
+        <input name="search" value ="{{search}}">
+        <input type="submit" value="검색">
+    </form>
+
+    게시물수 : {{boardCount}}
+    <a href="write">글쓰기</a>
+    <table border="1">
+        <tr>
+            <th>번호</th>
+            <th>이름</th>
+            <th>제목</th>
+            <th>날짜</th>
+            <th>조회수</th>
+            <th>첨부파일</th>
+            <th>다운로드</th>
+        </tr>
+        {% for row in boardList %}
+        <tr>
+            <td>{{row.idx}}</td>
+            <td>{{row.writer}}</td>
+            <td><a href="detail?idx={{row.idx}}">{{row.title}}</a></td>
+            <td>{{row.post_date | date:'Y-m-d'}}</td>
+            <td>{{row.hit}}</td>
+            <td>
+                {% if row.filesize > 0 %}
+                    <a href="download?idx={{row.idx}}"><img src="{% static 'images/file.png' %}" width = "50px" height = "50px" alt=""></a>
+                {% endif %}
+            </td>
+            <td>{{row.down}}</td>
+        </tr>
+        {% endfor %}
+
+        <tr>
+            <td colspan="7" align="center">
+                {% if start_page >= page_list_size %}
+                    <a href="?start={{prev_list}}">[이전]</a>
+                {% endif %}
+                {% autoescape off %}
+                    {% for link in links %}
+                        {{link}}
+                    {% endfor %}
+                {% endautoescape %}
+                {% if total_page > end_page %}
+                    <a href="?start={{next_list}}">[다음]</a>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    
+</body>
+</html>

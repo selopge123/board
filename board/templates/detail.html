@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script>
+        function update(){
+            document.form1.action = "../update/";
+            document.form1.submit();
+        }
+
+        function del(){
+            if (confirm("삭제하시겠습니까?")){
+                document.form1.action = "../delete/";
+                document.form1.submit()
+            }
+        }
+        
+        function home(){
+            location.href="/";
+        }
+    </script>
+</head>
+<body>
+    <h2>게시물 편집</h2>
+    <form method="post" name="form1" enctype="multipart/form-data">
+    {% csrf_token %}
+    <table border="1" width = '700px'>
+        <tr>
+            <td>이름</td>
+            <td><input name="writer" value="{{row.writer}}"></td>
+        </tr>
+        <tr>
+            <td>제목</td>
+            <td><input name="title" value="{{row.title}}"></td>
+        </tr>
+        <tr>
+            <td>날짜</td>
+            <td>{{row.post_date}}</td>
+        </tr>
+        <tr>
+            <td>조회수</td>
+            <td>{{row.hit}}</td>
+        </tr>
+        <tr>
+            <td>내용</td>
+            <td><textarea name="content" cols="60" rows="5">{{row.content}}</textarea></td>
+        </tr>
+        <tr>
+            <td>첨부파일</td>
+            <td>{% if row.filesize > 0 %}
+                <a href="../download?idx={{row.idx}}/">{{row.filename}}</a>  <!--링크 만들기 어렵다 -_- -->
+                ( {{filesize}} KB)
+                {% endif %}
+                <input type="file" name = 'file'>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <input type="hidden" name="idx" value="{{row.idx}}">
+                <input type="button" value="수정" onclick="update()">
+                <input type="button" value="삭제" onclick="del()">
+                <input type="button" value="목록" onclick="home()">
+            </td>
+        </tr>
+    </table>
+    </form> 
+
+<!-- 댓글 작성폼 -->
+<form action="../reply_insert/" method="post">
+{% csrf_token %}
+    <input name="writer" placeholder="이름"><br>
+    <textarea cols="80" rows="5" name = "content" placeholder="댓글을 작성하세요"></textarea><br>
+    <input type="hidden" name = "idx" value = "{{row.idx}}">
+    <button>댓글쓰기</button>
+</form>
+
+<!--댓글 목록 표시-->
+<table border="1" width="700px">
+    {% for row in commentList %}
+        <tr>
+            <td>
+                {{row.writer}}( {{row.post_date}} ) <br>
+                {{row.content}}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+
+</body>
+</html>
